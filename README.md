@@ -6,6 +6,9 @@
 
 It combines a calm writing workspace with generated titles, critical reflections, small goals, mood signals, and conversational follow-up. Journal notes are stored locally in the browser by default, keeping the product centered on user ownership rather than a cloud-first data model.
 
+<img width="1885" height="860" alt="Screenshot 2026-10-07 172037" src="https://github.com/user-attachments/assets/1009ecd9-c071-4461-9fc1-4674f01895ee" />
+
+
 ## Product Highlights
 
 - Local-first journal storage using browser IndexedDB
@@ -17,6 +20,9 @@ It combines a calm writing workspace with generated titles, critical reflections
 - Offline fallback reflection mode when no LLM key is configured
 - Responsive interface for desktop and mobile
 - Dockerized FastAPI service with a health check
+
+<img width="1830" height="487" alt="Screenshot 2026-10-07 172055" src="https://github.com/user-attachments/assets/df95d6a2-f338-4373-ae32-f44aa0ae75c4" />
+
 
 ## Privacy Model
 
