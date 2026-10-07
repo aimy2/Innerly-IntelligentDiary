@@ -1,44 +1,167 @@
 # Innerly
 
-A privacy-first conversational journaling assistant powered by FastAPI and an OpenAI-compatible LLM API.
+[![CI](https://github.com/aimy2/Innerly-IntelligentDiary/actions/workflows/ci.yml/badge.svg)](https://github.com/aimy2/Innerly-IntelligentDiary/actions/workflows/ci.yml)
 
-## Run locally
+**Innerly is a privacy-first journaling companion that helps people capture daily experiences, notice patterns, and reflect with more clarity.**
+
+It combines a calm writing workspace with generated titles, critical reflections, small goals, mood signals, and conversational follow-up. Journal notes are stored locally in the browser by default, keeping the product centered on user ownership rather than a cloud-first data model.
+
+## Product Highlights
+
+- Local-first journal storage using browser IndexedDB
+- Create, edit, and delete journal notes
+- Generated creative titles, insights, critical reflections, goals, and tags
+- Short journal previews with date, time, and mood
+- Conversational follow-up grounded in the current note
+- Personalized daily assessment and life quotes
+- Offline fallback reflection mode when no LLM key is configured
+- Responsive interface for desktop and mobile
+- Dockerized FastAPI service with a health check
+
+## Privacy Model
+
+Innerly separates persistence from analysis:
+
+- Journal notes are saved in IndexedDB on the device where they are written.
+- Existing server-side entries are imported into IndexedDB on the first page load.
+- New saves, edits, and deletes in the browser use the local store.
+- With no `LLM_API_KEY`, reflection uses local fallback logic and journal text is not sent to an external LLM provider. When the app is run locally, that processing remains on the local machine.
+- With an LLM key configured, note text is sent to the configured OpenAI-compatible provider for analysis. The browser workflow does not persist those notes through the API.
+
+Browser storage is device- and browser-specific. Clearing browser data can remove notes, and notes do not automatically synchronize across devices. A production rollout should add encrypted export/import or a user-controlled synchronization service before positioning Innerly as a multi-device system.
+
+## Architecture
+
+```text
+Browser
+  |-- IndexedDB: local journal notes
+  |-- Fetch API: analysis, chat, and daily context
+  |
+FastAPI service
+  |-- Journal and analysis endpoints
+  |-- OpenAI-compatible LLM integration
+  |-- SQLite persistence for server-side API compatibility
+  |
+Deployment
+  |-- Docker image
+  |-- GitHub Actions CI/CD
+  |-- GitHub Container Registry publishing
+```
+
+### Technology
+
+- **Backend:** Python, FastAPI, Pydantic, SQLite
+- **Frontend:** HTML, CSS, vanilla JavaScript, IndexedDB
+- **AI integration:** OpenAI-compatible chat completion API
+- **Testing:** pytest
+- **Delivery:** Docker, Docker Compose, GitHub Actions, GitHub Container Registry
+
+## Quick Start
+
+### Requirements
+
+- Python 3.12+
+- pip
+- Optional: Docker Desktop
+- Optional: an API key for an OpenAI-compatible LLM provider
+
+### Run Locally
 
 ```powershell
 Copy-Item .env.example .env
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload
 ```
 
-Open http://localhost:8000. Without an API key, Innerly uses a small local reflection mode so no journal text leaves the machine. Add `LLM_API_KEY` to `.env` to enable personalized LLM analysis.
+Open <http://localhost:8000>.
 
-## Run with Docker
+The application works without an LLM key. To enable provider-backed analysis, add the key to `.env`:
+
+```env
+LLM_API_KEY=your_provider_key
+```
+
+Never commit `.env` or expose an API key in frontend code.
+
+### Run with Docker
 
 ```powershell
 Copy-Item .env.example .env
-# edit .env and add an API key if desired
+# Edit .env if provider-backed analysis is required.
 docker compose up --build
 ```
 
-Journal data is stored in `data/innerly.db` locally or in the `innerly_data` Docker volume. The API never logs entry content.
+Open <http://localhost:8000>. Journal data created by the server-side API is stored in `data/innerly.db` locally or in the `innerly_data` Docker volume. The container runs as a non-root user and exposes `/api/health` for health monitoring.
 
-## Local-first storage
+## API Surface
 
-Journal notes are stored in the browser's IndexedDB on the device where they are written. On the first page load, existing server notes are imported into that local store; new saves, edits, and deletes use the local store. Reflection analysis is requested from the API, but the browser workflow does not persist notes through the API.
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Service health check |
+| `GET` | `/api/entries` | List server-side entries |
+| `POST` | `/api/analyze` | Analyze text without persisting it |
+| `POST` | `/api/entries` | Create a server-side entry |
+| `PUT` | `/api/entries/{id}` | Update and re-analyze an entry |
+| `DELETE` | `/api/entries/{id}` | Delete a server-side entry |
+| `GET` | `/api/daily-context` | Generate daily assessment and quote |
+| `POST` | `/api/chat` | Continue a conversation about a note |
 
-Clearing browser data can remove local notes, and notes do not automatically appear on another device. Export/import backup and cross-device sync can be added later.
+Interactive API documentation is available at <http://localhost:8000/docs> while the service is running.
+
+## Testing
+
+Run the test suite with:
+
+```powershell
+pytest -q
+```
+
+Validate the browser script with:
+
+```powershell
+node --check static/app.js
+```
 
 ## CI/CD
 
-GitHub Actions runs the test suite on pushes to `main` and pull requests. A successful test job then builds the Docker image with Buildx and GitHub Actions layer caching. Pushes to `main` also publish `ghcr.io/aimy2/innerly-intelligentdiary:latest` and a commit-SHA tag to GitHub Container Registry. The workflow is defined in `.github/workflows/ci.yml`.
+GitHub Actions runs on pull requests and pushes to `main`:
 
-To build and run the image locally:
+1. Installs Python dependencies.
+2. Runs the pytest suite.
+3. Builds the Docker image with Buildx and GitHub Actions cache.
+4. Publishes the image on successful `main` pushes to GitHub Container Registry.
 
-```powershell
-docker build -t innerly:local .
-docker compose up --build
+Published image references:
+
+```text
+ghcr.io/aimy2/innerly-intelligentdiary:latest
+ghcr.io/aimy2/innerly-intelligentdiary:sha-<commit>
 ```
 
-The container runs as a non-root user and exposes a health check at `/api/health`.
+The workflow is defined in [.github/workflows/ci.yml](.github/workflows/ci.yml).
+
+## Deployment Notes
+
+The repository is ready to deploy as a Docker service on a platform such as DigitalOcean, Render, Azure, or another container host. The host must provide:
+
+- A public HTTP port, supplied through the `PORT` environment variable when required
+- `LLM_API_KEY` only when provider-backed analysis is desired
+- Persistent storage if server-side SQLite data is used
+- HTTPS and secret management for production use
+
+No public production deployment is included by default. The local-first browser workflow is suitable for private personal use; multi-user production use requires authentication, authorization, encrypted backups, and a durable database strategy.
+
+## Repository
+
+- GitHub: <https://github.com/aimy2/Innerly-IntelligentDiary>
+- CI workflow: [.github/workflows/ci.yml](.github/workflows/ci.yml)
+- Docker image definition: [Dockerfile](Dockerfile)
+- Application source: [app](app)
+- Frontend source: [static](static)
+- Tests: [tests](tests)
+
+## License
+
+No license has been specified yet. Add a license before distributing Innerly as a reusable company or open-source project.
