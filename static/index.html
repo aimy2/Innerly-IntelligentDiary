@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Innerly | Your private journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>.friend-reflection { color: var(--ink); font: 17px/1.7 var(--serif); max-width: 680px; }.friend-reflection .reflection-label { color: var(--coral); font-size: 10px; }.friend-reflection #reflection { margin-top: 5px; }</style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-mark">i</span><span>innerly</span></a>
+      <div class="privacy-note"><span class="status-dot"></span>private by default</div>
+    </header>
+    <section class="daily-strip">
+      <div><p class="eyebrow">YOUR INNER WEATHER</p><p id="assessment">Listening for a pattern in your recent notes...</p></div>
+      <div class="quote"><span class="quote-mark">“</span><p id="quote">A quiet thought can still change the shape of a day.</p><cite id="quote-source">INNERLY</cite></div>
+    </section>
+    <main class="workspace">
+      <aside class="journal-list">
+        <div class="list-heading"><div><p class="eyebrow">YOUR JOURNAL</p><h2>Recent notes</h2></div><button class="new-button" id="new-entry" title="Write a new note">+</button></div>
+        <div id="history-list"><p class="empty-state">Your reflections will gather here.</p></div>
+      </aside>
+      <section class="editor-column">
+        <div class="editor-heading"><div><p class="eyebrow" id="editor-kicker">TODAY · NEW NOTE</p><input class="title-input" id="title" maxlength="120" placeholder="A title will grow from your words..."></div><span class="word-count" id="word-count">0 words</span></div>
+        <textarea id="entry" placeholder="What happened today?&#10;&#10;There is no right way to begin..." aria-label="Journal note"></textarea>
+        <div class="entry-tools">
+          <div class="moods" aria-label="Choose a mood">
+            <button class="mood selected" data-mood="steady" title="Steady" aria-label="Steady">◌</button>
+            <button class="mood" data-mood="bright" title="Bright" aria-label="Bright">☼</button>
+            <button class="mood" data-mood="heavy" title="Heavy" aria-label="Heavy">◒</button>
+            <button class="mood" data-mood="tender" title="Tender" aria-label="Tender">♡</button>
+          </div>
+          <button class="primary-button" id="save-entry">Done <span>↗</span></button>
+        </div>
+        <p class="entry-status" id="entry-status"></p>
+        <section class="insight-panel" id="insight-panel" hidden>
+          <div class="panel-top"><span class="panel-label">A NOTE BACK</span><span class="ai-badge">INNERLY / REFLECTION</span></div>
+          <h3 id="insight-title"></h3><p class="insight" id="insight"></p>
+          <div class="reflection friend-reflection"><span class="reflection-icon">✦</span><div><p class="reflection-label">A FRIEND'S READ</p><p id="reflection"></p></div></div>
+          <div class="goal"><span class="reflection-icon">→</span><div><p class="reflection-label">A SMALL GOAL</p><p id="goal"></p></div></div>
+          <div class="tag-list" id="tags"></div>
+        </section>
+        <section class="conversation-panel">
+          <div class="panel-top"><span class="panel-label">KEEP THE THREAD GOING</span><span class="panel-label muted">CONVERSATION</span></div>
+          <div class="chat-log" id="chat-log"><div class="chat-message assistant">Bring me a question, a feeling, or a half-formed thought.</div></div>
+          <form class="chat-form" id="chat-form"><input id="chat-input" placeholder="Ask about what you wrote..." autocomplete="off"><button aria-label="Send message" title="Send message">↗</button></form>
+        </section>
+      </section>
+    </main>
+    <footer><span>INNERLY</span><span>Nothing here is shared without your say-so.</span></footer>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

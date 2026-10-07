@@ -1,0 +1,13 @@
+services:
+  innerly:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - innerly_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  innerly_data:
