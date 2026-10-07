@@ -101,6 +101,8 @@ docker compose up --build
 
 Open <http://localhost:8000>. Journal data created by the server-side API is stored in `data/innerly.db` locally or in the `innerly_data` Docker volume. The container runs as a non-root user and exposes `/api/health` for health monitoring.
 
+The Docker image has been verified locally with Docker Desktop. The container reached a healthy state and served the application successfully through `http://localhost:8000`.
+
 ## API Surface
 
 | Method | Endpoint | Purpose |
