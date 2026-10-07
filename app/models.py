@@ -15,6 +15,10 @@ class EntryUpdate(BaseModel):
     title: str | None = Field(default=None, max_length=120)
 
 
+class AnalyzeRequest(BaseModel):
+    content: str = Field(min_length=1, max_length=20_000)
+
+
 class Entry(BaseModel):
     id: int
     content: str
@@ -28,6 +32,14 @@ class Entry(BaseModel):
     tags: list[str] = []
 
 
+class AnalyzeResponse(BaseModel):
+    title: str
+    insight: str
+    reflection: str
+    goal: str
+    tags: list[str]
+
+
 class DailyContext(BaseModel):
     assessment: str
     quote: str
@@ -37,6 +49,7 @@ class DailyContext(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=4_000)
     entry_id: int | None = None
+    context: str = Field(default="", max_length=20_000)
 
 
 class ChatResponse(BaseModel):

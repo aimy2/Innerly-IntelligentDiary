@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import get_settings
 from .database import create_entry, delete_entry, get_entry, init_db, list_entries, update_entry
 from .llm import analyze_entry, answer_chat, daily_context
-from .models import ChatRequest, ChatResponse, DailyContext, Entry, EntryCreate, EntryUpdate
+from .models import AnalyzeRequest, AnalyzeResponse, ChatRequest, ChatResponse, DailyContext, Entry, EntryCreate, EntryUpdate
 
 
 @asynccontextmanager
@@ -39,6 +39,12 @@ async def add_entry(payload: EntryCreate) -> Entry:
     return create_entry(payload, payload.title or title, insight, reflection, goal, tags)
 
 
+@app.post("/api/analyze", response_model=AnalyzeResponse)
+async def analyze(payload: AnalyzeRequest) -> AnalyzeResponse:
+    title, insight, reflection, goal, tags = await analyze_entry(payload.content)
+    return AnalyzeResponse(title=title, insight=insight, reflection=reflection, goal=goal, tags=tags)
+
+
 @app.put("/api/entries/{entry_id}", response_model=Entry)
 async def edit_entry(entry_id: int, payload: EntryUpdate) -> Entry:
     if not get_entry(entry_id):
@@ -61,7 +67,7 @@ async def get_daily_context() -> DailyContext:
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(payload: ChatRequest) -> ChatResponse:
-    context = ""
+    context = payload.context
     if payload.entry_id:
         entry = get_entry(payload.entry_id)
         if not entry:

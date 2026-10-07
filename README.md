@@ -24,6 +24,12 @@ docker compose up --build
 
 Journal data is stored in `data/innerly.db` locally or in the `innerly_data` Docker volume. The API never logs entry content.
 
+## Local-first storage
+
+Journal notes are stored in the browser's IndexedDB on the device where they are written. On the first page load, existing server notes are imported into that local store; new saves, edits, and deletes use the local store. Reflection analysis is requested from the API, but the browser workflow does not persist notes through the API.
+
+Clearing browser data can remove local notes, and notes do not automatically appear on another device. Export/import backup and cross-device sync can be added later.
+
 ## CI/CD
 
 GitHub Actions runs the test suite on pushes to `main` and pull requests. A successful test job then builds the Docker image with Buildx and GitHub Actions layer caching. Pushes to `main` also publish `ghcr.io/aimy2/innerly-intelligentdiary:latest` and a commit-SHA tag to GitHub Container Registry. The workflow is defined in `.github/workflows/ci.yml`.
