@@ -26,7 +26,7 @@ Journal data is stored in `data/innerly.db` locally or in the `innerly_data` Doc
 
 ## CI/CD
 
-GitHub Actions runs the test suite on pushes to `main` and pull requests. A successful test job then builds the Docker image with Buildx and GitHub Actions layer caching. The workflow is defined in `.github/workflows/ci.yml`.
+GitHub Actions runs the test suite on pushes to `main` and pull requests. A successful test job then builds the Docker image with Buildx and GitHub Actions layer caching. Pushes to `main` also publish `ghcr.io/aimy2/innerly-intelligentdiary:latest` and a commit-SHA tag to GitHub Container Registry. The workflow is defined in `.github/workflows/ci.yml`.
 
 To build and run the image locally:
 
